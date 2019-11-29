@@ -21,7 +21,7 @@ interface FileUploadService{
 
 fun uploadFile(file: File){
     val service =
-        SeviceGenerator().createService(FileUploadService::class.java)
+        ServiceGenerator().createService(FileUploadService::class.java)
 
     val requestFile: RequestBody =
         RequestBody.create(MediaType.parse("multipart/form-data"),file)
