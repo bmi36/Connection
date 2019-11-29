@@ -19,7 +19,7 @@ interface FileUploadService{
                @Part file: MultipartBody.Part): Call<RequestBody>
 }
 
-fun uploadfile(file: File){
+fun uploadFile(file: File){
     val service =
         SeviceGenerator().createService(FileUploadService::class.java)
 
