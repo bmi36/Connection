@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun registerDatabase(file: File) {
         val contentValues = ContentValues().also {
-            it.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            it.put(MediaStore.Images.Media.MIME_TYPE, "image/jpg")
             it.put("_data", file.absolutePath)
         }
         this.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
