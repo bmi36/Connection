@@ -107,7 +107,8 @@ class MainActivity : AppCompatActivity() {
             Log.d("file","${file.path}\n${file.name}\n${file.parent}")
             Log.d("test",data?.extras?.get("data").toString())
             val bim = BitmapFactory.decodeFile(file.path)
-            HttpRespondsAsync(bim)
+            HttpRespondsAsync(bim).execute()
+
             Intent(this, Image::class.java)
                 .putExtra("file",file)
                 .putExtra("uri", uri).let {

@@ -13,7 +13,7 @@ const val BASE = "/json/android_server/"
 
 class ServiceGenerator{
     private val builder = Retrofit.Builder()
-        .baseUrl(URL+ BASE)
+        .baseUrl("http://192.168.3.7:8080/json/android_server/php1.php")
         .addConverterFactory(GsonConverterFactory.create())
 
     private var retrofit = builder.build()

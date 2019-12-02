@@ -23,8 +23,9 @@ class HttpRespondsAsync(bim: Bitmap): AsyncTask<Bitmap, Unit, String>() {
 
     override fun doInBackground(vararg params: Bitmap?): String? {
 
-        val word = "word${Gson().toJson(image)}"
-        val url = java.net.URL(URL)
+        val word = "a"
+//        val word = "word${Gson().toJson(image)}"
+        val url = java.net.URL(URL+ BASE+"php1.php")
         val con = url.openConnection() as HttpURLConnection
         con.requestMethod = "POST"
         con.instanceFollowRedirects = false
@@ -41,8 +42,6 @@ class HttpRespondsAsync(bim: Bitmap): AsyncTask<Bitmap, Unit, String>() {
         outputStream.write(word)
         outputStream.flush()
 
-        Log.d("test","outStream flush!!")
-
         val status = con.responseCode
 
         return if (status == HttpURLConnection.HTTP_OK){
@@ -50,6 +49,7 @@ class HttpRespondsAsync(bim: Bitmap): AsyncTask<Bitmap, Unit, String>() {
             "HTTP_OK"
         }else{
             Log.d("test","出来てないかも―")
+            Log.d("test",status.toString())
             "status ->$status"
         }
     }
