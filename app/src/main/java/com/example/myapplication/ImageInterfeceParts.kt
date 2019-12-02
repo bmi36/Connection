@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 const val URL = "http://192.168.3.7:8080"
 const val PROBASE = "/json/server_android/result_return.json"
-const val BASE = "/json/android_server/json_create.json"
+const val BASE = "/json/android_server/php1.php"
 
 class ServiceGenerator{
     private val builder = Retrofit.Builder()
