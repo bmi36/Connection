@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -103,11 +104,16 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == CAMERA_REQUEST_CODE) {
             registerDatabase(file)
+            val data = data?.extras?.get("data") as Bitmap
+            HttpResonsAsync(data)
             Intent(this, Image::class.java).run {
                 this.putExtra("uri", uri)
-                this.putExtra("file",file)
                 startActivity(this)
             }
         }
+    }
+
+    private fun postMultipart(image: Image,string: String){
+
     }
 }
