@@ -4,12 +4,12 @@ import android.Manifest
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -31,9 +31,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        Camerabutton.setOnClickListener {
-            if (Build.VERSION.SDK_INT >= 23) checkPermission() else cameraIntent()
-        }
+        Camerabutton.setOnClickListener { cameraIntent() }
     }
 
     private fun requestPermission() {
@@ -65,7 +63,7 @@ class MainActivity : AppCompatActivity() {
 
         file = File(folder, name)
         uri = FileProvider.getUriForFile(
-            this.applicationContext, "$packageName.fileprovider",
+            applicationContext, "$packageName.fileprovider",
             file
         )
 
@@ -102,18 +100,20 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        Log.d("test",requestCode.toString())
+        Log.d("test",resultCode.toString())
         if (requestCode == CAMERA_REQUEST_CODE) {
             registerDatabase(file)
-            val data = data?.extras?.get("data") as Bitmap
-            HttpResonsAsync(data)
-            Intent(this, Image::class.java).run {
-                this.putExtra("uri", uri)
-                startActivity(this)
+            Log.d("file","${file.path}\n${file.name}\n${file.parent}")
+            Log.d("test",data?.extras?.get("data").toString())
+            val bim = BitmapFactory.decodeFile(file.path)
+            HttpRespondsAsync(bim)
+            Intent(this, Image::class.java)
+                .putExtra("file",file)
+                .putExtra("uri", uri).let {
+                startActivity(it)
             }
+
         }
-    }
-
-    private fun postMultipart(image: Image,string: String){
-
     }
 }
