@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.android.synthetic.main.activity_image.*
 import java.io.File
 
 class Image : AppCompatActivity() {
@@ -21,7 +22,7 @@ class Image : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_image)
 //        uploadFile(file)
-//        cameraImage.setImageURI(uri)
+        cameraImage.setImageURI(uri)
         Log.d("test",uri.path)
 
     }

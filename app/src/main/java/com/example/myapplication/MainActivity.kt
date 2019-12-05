@@ -18,9 +18,13 @@ import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.concurrent.thread
 
 const val CAMERA_REQUEST_CODE = 1
 const val CAMERA_PERMISSION_REQUEST_CODE = 2
+const val URL = "http://192.168.3.7:8080"
+const val PROBASE = "/json/server_android/result_return.json"
+const val BASE = "/post"
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,8 +34,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        Camerabutton.setOnClickListener { cameraIntent() }
+        Camerabutton.setOnClickListener { checkPermission() }
     }
 
     private fun requestPermission() {
@@ -58,7 +61,7 @@ class MainActivity : AppCompatActivity() {
     private fun cameraIntent() {
         val folder = getExternalFilesDir(Environment.DIRECTORY_DCIM)
         val name = SimpleDateFormat("ddHHmmss", Locale.US).format(Date()).let {
-            String.format("CameraIntent_%s.jpeg",it)
+            String.format("CameraIntent_%s.jpeg", it)
         }
 
         file = File(folder, name)
@@ -100,19 +103,17 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Log.d("test",requestCode.toString())
-        Log.d("test",resultCode.toString())
         if (requestCode == CAMERA_REQUEST_CODE) {
-            registerDatabase(file)
-            Log.d("file","${file.path}\n${file.name}\n${file.parent}")
-            Log.d("test",data?.extras?.get("data").toString())
-            val bim = BitmapFactory.decodeFile(file.path)
-            HttpRespondsAsync(bim).execute()
+            thread {
+                registerDatabase(file)
+                val bim = BitmapFactory.decodeFile(file.path)
+                uploadToServer(bim)
 
-            Intent(this, Image::class.java)
-                .putExtra("file",file)
-                .putExtra("uri", uri).let {
-                startActivity(it)
+                startActivity(
+                    Intent(this, Image::class.java)
+                        .putExtra("file", file)
+                        .putExtra("uri", uri)
+                )
             }
 
         }

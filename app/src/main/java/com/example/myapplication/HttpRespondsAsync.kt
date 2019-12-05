@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.os.AsyncTask
 import android.util.Base64
 import android.util.Log
-import com.google.gson.Gson
 import java.io.ByteArrayOutputStream
 import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
@@ -23,9 +22,8 @@ class HttpRespondsAsync(bim: Bitmap): AsyncTask<Bitmap, Unit, String>() {
 
     override fun doInBackground(vararg params: Bitmap?): String? {
 
-        val word = "a"
-//        val word = "word${Gson().toJson(image)}"
-        val url = java.net.URL(URL+ BASE+"php1.php")
+        val word = "word$params"
+        val url = java.net.URL(URL+ BASE)
         val con = url.openConnection() as HttpURLConnection
         con.requestMethod = "POST"
         con.instanceFollowRedirects = false
@@ -44,6 +42,7 @@ class HttpRespondsAsync(bim: Bitmap): AsyncTask<Bitmap, Unit, String>() {
 
         val status = con.responseCode
 
+        Log.d("result", mbim.toString())
         return if (status == HttpURLConnection.HTTP_OK){
             Log.d("test","出来たかもー")
             "HTTP_OK"
