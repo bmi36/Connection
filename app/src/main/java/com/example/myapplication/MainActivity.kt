@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
     private fun cameraIntent() {
         val folder = getExternalFilesDir(Environment.DIRECTORY_DCIM)
         val name = SimpleDateFormat("ddHHmmss", Locale.US).format(Date()).let {
-            String.format("CameraIntent_%s.jpeg", it)
+            String.format("CameraIntent_%s.jpg", it)
         }
 
         file = File(folder, name)
@@ -106,8 +106,7 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == CAMERA_REQUEST_CODE) {
             thread {
                 registerDatabase(file)
-                val bim = BitmapFactory.decodeFile(file.path)
-                uploadToServer(bim)
+                uploadToServer(file)
 
                 startActivity(
                     Intent(this, Image::class.java)
