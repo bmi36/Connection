@@ -21,7 +21,7 @@ class Image : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_image)
-//        uploadFile(file)
+
         cameraImage.setImageURI(uri)
         Log.d("test",uri.path)
 
