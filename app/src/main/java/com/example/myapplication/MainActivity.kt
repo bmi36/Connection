@@ -4,14 +4,18 @@ import android.Manifest
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
+import androidx.core.net.toFile
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.text.SimpleDateFormat
@@ -35,6 +39,7 @@ class MainActivity : AppCompatActivity() {
         Camerabutton.setOnClickListener { checkPermission() }
     }
 
+    //ぱーにっしょんをリクエストするやつ
     private fun requestPermission() {
         val str: Array<String> = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
@@ -47,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //ぱーにっしょん確認するやつ
     private fun checkPermission() {
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -56,6 +62,7 @@ class MainActivity : AppCompatActivity() {
         ) cameraIntent() else requestPermission()
     }
 
+//    カメラ起動させるやつ
     private fun cameraIntent() {
         val folder = getExternalFilesDir(Environment.DIRECTORY_DCIM)
         val name = SimpleDateFormat("ddHHmmss", Locale.US).format(Date()).let {
@@ -74,6 +81,7 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
+    //写真をDB内に追加するやつ
     private fun registerDatabase(file: File) {
         val contentValues = ContentValues().also {
             it.put(MediaStore.Images.Media.MIME_TYPE, "image/jpg")
@@ -83,6 +91,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    //ぱーにっしょん
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -99,19 +108,22 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    //写真撮った後のやつ
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == CAMERA_REQUEST_CODE) {
             thread {
+
                 registerDatabase(file)
-                uploadToServer(file)
+                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                uploadToServer(bitmap)
+            }
 
                 startActivity(
                     Intent(this, Image::class.java)
                         .putExtra("file", file)
                         .putExtra("uri", uri)
                 )
-            }
 
         }
     }
