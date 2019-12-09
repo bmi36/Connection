@@ -1,5 +1,7 @@
 package com.example.myapplication
 
+import android.graphics.Bitmap
+import android.util.Base64
 import android.util.Log
 import okhttp3.*
 import retrofit2.Call
@@ -10,6 +12,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 
@@ -17,8 +20,8 @@ interface Upload {
     @Multipart
     @POST(BASE)
     fun uploadImage(
-        @Part image: MultipartBody.Part,
-        @Part("name") result: RequestBody
+        @Part("description") description: RequestBody,
+        @Part image: MultipartBody.Part
     ): Call<TestCallback>
 }
 
@@ -37,12 +40,13 @@ class NetworkClient {
 fun uploadToServer(file: File) {
     val retrofit = NetworkClient().retrofitBuild()
 
-    val part = RequestBody.create(MediaType.parse("image/jpeg"), file).let {
-        MultipartBody.Part.createFormData("upload", file.name, it)
-    }
-    val description = RequestBody.create(MediaType.parse("text/plan"), "image-type")
+    val description = RequestBody.create(MultipartBody.FORM,"TODO test")
+    val type = file.path.substring(file.path.lastIndexOf(".") + 1)
+    val requestFile = RequestBody.create(MediaType.parse(type),file)
 
-    retrofit.uploadImage(part,description).enqueue(object : Callback<TestCallback> {
+    val body = MultipartBody.Part.createFormData("picture", file.name,requestFile)
+
+    retrofit.uploadImage(description,body).enqueue(object : Callback<TestCallback> {
 
         override fun onFailure(call: Call<TestCallback>, t: Throwable) {
             Log.d("test", "えらー")
@@ -57,4 +61,12 @@ fun uploadToServer(file: File) {
         }
 
     })
+}
+
+//写真をBASE64にエンコードするやつ
+private fun toBase(bitmap: Bitmap): String? {
+    val bao = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bao)
+    val ba = bao.toByteArray()
+    return Base64.encodeToString(ba, Base64.DEFAULT)
 }
