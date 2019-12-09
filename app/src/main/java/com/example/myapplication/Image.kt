@@ -22,8 +22,20 @@ class Image : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_image)
 
+
+       show()
+
         cameraImage.setImageURI(uri)
         Log.d("test",uri.path)
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        textView.text = intent?.extras?.getString("str","何もないよ")
+    }
+
+    private fun show(){
+        textView.text = intent?.extras?.getString("str","何もないよ")
     }
 }

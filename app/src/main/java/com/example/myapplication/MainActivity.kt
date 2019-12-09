@@ -14,6 +14,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -23,7 +26,6 @@ const val CAMERA_REQUEST_CODE = 1
 const val CAMERA_PERMISSION_REQUEST_CODE = 2
 const val URL = "http://192.168.3.7:8080"
 const val PROBASE = "/json/server_android/result_return.json"
-const val BASE = "/post"
 
 class MainActivity : AppCompatActivity() {
 
@@ -59,7 +61,7 @@ class MainActivity : AppCompatActivity() {
         ) cameraIntent() else requestPermission()
     }
 
-//    カメラ起動させるやつ
+    //    カメラ起動させるやつ
     private fun cameraIntent() {
         val folder = getExternalFilesDir(Environment.DIRECTORY_DCIM)
         val name = SimpleDateFormat("ddHHmmss", Locale.US).format(Date()).let {
@@ -109,19 +111,22 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == CAMERA_REQUEST_CODE) {
-            thread {
+
+            var str = "unko"
+
 
                 registerDatabase(file)
                 val bitmap = BitmapFactory.decodeFile(file.absolutePath)
                 uploadToServer(bitmap)
-            }
+
 
                 startActivity(
                     Intent(this, Image::class.java)
+                        .putExtra("str", str)
                         .putExtra("file", file)
                         .putExtra("uri", uri)
                 )
 
+            }
         }
-    }
 }

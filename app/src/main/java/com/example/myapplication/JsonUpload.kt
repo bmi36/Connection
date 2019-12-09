@@ -14,7 +14,7 @@ import retrofit2.http.POST
 import java.io.ByteArrayOutputStream
 
 interface RetrofitInterface {
-    @POST(BASE)
+    @POST("/post")
     fun sendImage(@Body image: String?): Call<TestCallback>
 }
 
@@ -34,23 +34,27 @@ fun retrofitBuild(): RetrofitInterface {
         .build().create(RetrofitInterface::class.java)
 }
 
-fun uploadToServer(bitmap: Bitmap) {
+fun uploadToServer(bitmap: Bitmap): String {
     val retrofit = retrofitBuild()
     val image = toBase(bitmap)
     Log.d("test", retrofit.toString())
 
+    var str = ""
     retrofit.sendImage(image).enqueue(object : Callback<TestCallback> {
 
         override fun onFailure(call: Call<TestCallback>, t: Throwable) {
-            Log.d("result", "失敗した")
-            Log.d("unko", t.message)
+            str ="失敗した\n${t.message}"
+
         }
 
         override fun onResponse(call: Call<TestCallback>, response: Response<TestCallback>) {
             Log.d("result", "成功した")
-            Log.d("result",response.body().toString())
+            Log.d("result", response.message())
+
+            str = "成功した\n${response.message()}"
         }
 
     })
+    return str
 }
 
