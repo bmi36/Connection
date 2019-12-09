@@ -60,6 +60,3 @@ fun uploadToServer(bitmap: Bitmap){
     })
 }
 
-private fun chengeFile(file: File){
-}
-
