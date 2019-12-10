@@ -34,16 +34,16 @@ fun retrofitBuild(): RetrofitInterface {
         .build().create(RetrofitInterface::class.java)
 }
 
-fun uploadToServer(bitmap: Bitmap): String {
+fun uploadToServer(bitmap: Bitmap){
     val retrofit = retrofitBuild()
     val image = toBase(bitmap)
     Log.d("test", retrofit.toString())
 
-    var str = ""
     retrofit.sendImage(image).enqueue(object : Callback<TestCallback> {
 
         override fun onFailure(call: Call<TestCallback>, t: Throwable) {
-            str ="失敗した\n${t.message}"
+            "失敗した\n${t.message}"
+
 
         }
 
@@ -51,10 +51,9 @@ fun uploadToServer(bitmap: Bitmap): String {
             Log.d("result", "成功した")
             Log.d("result", response.message())
 
-            str = "成功した\n${response.message()}"
+            "成功した\n${response.message()}"
         }
 
     })
-    return str
 }
 

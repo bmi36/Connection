@@ -14,13 +14,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.concurrent.thread
 
 const val CAMERA_REQUEST_CODE = 1
 const val CAMERA_PERMISSION_REQUEST_CODE = 2
@@ -117,16 +113,17 @@ class MainActivity : AppCompatActivity() {
 
                 registerDatabase(file)
                 val bitmap = BitmapFactory.decodeFile(file.absolutePath)
-                uploadToServer(bitmap)
+                uploadToServer(bitmap,intent)
 
-
-                startActivity(
-                    Intent(this, Image::class.java)
-                        .putExtra("str", str)
-                        .putExtra("file", file)
-                        .putExtra("uri", uri)
-                )
 
             }
         }
+
+    private val intent = {
+        startActivity(
+            Intent(this, Image::class.java)
+                .putExtra("file", file)
+                .putExtra("uri", uri)
+        )
+    }
 }
