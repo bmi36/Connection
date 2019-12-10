@@ -1,8 +1,10 @@
 package com.example.myapplication
 
+import android.app.ProgressDialog
 import android.graphics.Bitmap
 import android.util.Base64
 import android.util.Log
+import android.widget.ProgressBar
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -37,7 +39,6 @@ fun retrofitBuild(): RetrofitInterface {
 fun uploadToServer(bitmap: Bitmap){
     val retrofit = retrofitBuild()
     val image = toBase(bitmap)
-    Log.d("test", retrofit.toString())
 
     retrofit.sendImage(image).enqueue(object : Callback<TestCallback> {
 

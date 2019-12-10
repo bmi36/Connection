@@ -108,16 +108,13 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == CAMERA_REQUEST_CODE) {
 
-            var str = "unko"
+            registerDatabase(file)
+            val bitmap = BitmapFactory.decodeFile(file.absolutePath)
 
 
-                registerDatabase(file)
-                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
-                uploadToServer(bitmap,intent)
 
-
-            }
         }
+    }
 
     private val intent = {
         startActivity(
