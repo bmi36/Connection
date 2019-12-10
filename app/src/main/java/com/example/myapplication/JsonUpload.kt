@@ -37,27 +37,23 @@ fun retrofitBuild(): RetrofitInterface {
         .build().create(RetrofitInterface::class.java)
 }
 
-fun uploadToServer(file: File, intent: Intent): Intent {
+suspend fun uploadToServer(file: File): TestCallback? {
     val bitmap = BitmapFactory.decodeFile(file.absolutePath)
     val retrofit = retrofitBuild()
     val image = toBase(bitmap)
-    var str = ""
+    var str : TestCallback? = null
     retrofit.sendImage(image).enqueue(object : Callback<TestCallback> {
 
         override fun onFailure(call: Call<TestCallback>, t: Throwable) {
-
-            str = "失敗した\n${t.message}"
         }
 
         override fun onResponse(call: Call<TestCallback>, response: Response<TestCallback>) {
             Log.d("result", "成功した")
             Log.d("result", response.message())
 
-            str = "成功した\n${response.body()?.foodname}\n${response.body()?.foodname}"
+            str =response.body()
         }
     })
-    intent.putExtra("request", str)
-
-    return intent
+    return str
 }
 

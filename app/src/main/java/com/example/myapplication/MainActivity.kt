@@ -14,8 +14,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.SimpleDateFormat
@@ -112,20 +112,19 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == CAMERA_REQUEST_CODE) {
 
             registerDatabase(file)
+            val intent = Intent(this,Image::class.java)
+            intent.putExtra("uri",uri)
 
-            Intent(this, Image::class.java).also {
-                 runBlocking {
-                     async {
-                         withContext(Dispatchers.Default) {
-                             it.putExtra("file", file)
-                                 .putExtra("uri", uri)
-                             intent = uploadToServer(file, intent)
-                         }
-                     }.await()
-                     startActivity(it)
-                 }
-            }
+            response(intent)
 
         }
     }
+
+    private fun response(intent: Intent)= GlobalScope.launch(Dispatchers.Main){
+        withContext(Dispatchers.Default) { uploadToServer(file) }.let {
+            intent.putExtra("res", it.toString())
+            startActivity(intent)
+        }
+    }
+
 }

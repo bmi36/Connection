@@ -16,7 +16,7 @@ class Image : AppCompatActivity() {
 
 
     private val result by lazy {
-        intent?.extras?.getString("request", "💩")
+        intent?.extras?.getString("rest", "💩")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
