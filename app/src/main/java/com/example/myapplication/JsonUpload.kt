@@ -47,7 +47,6 @@ fun uploadToServer(file: File, intent: Intent): Intent {
         override fun onFailure(call: Call<TestCallback>, t: Throwable) {
 
             str = "失敗した\n${t.message}"
-
         }
 
         override fun onResponse(call: Call<TestCallback>, response: Response<TestCallback>) {
@@ -55,11 +54,10 @@ fun uploadToServer(file: File, intent: Intent): Intent {
             Log.d("result", response.message())
 
             str = "成功した\n${response.message()}"
-
-
         }
     })
     intent.putExtra("request", str)
+
     return intent
 }
 

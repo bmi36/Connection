@@ -16,6 +16,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.concurrent.thread
 
 const val CAMERA_REQUEST_CODE = 1
 const val CAMERA_PERMISSION_REQUEST_CODE = 2
@@ -113,7 +114,9 @@ class MainActivity : AppCompatActivity() {
                 .putExtra("file", file)
                 .putExtra("uri", uri)
 
-            startActivity(uploadToServer(file,intent))
+            thread {
+                startActivity(uploadToServer(file, intent))
+            }
         }
     }
 }
