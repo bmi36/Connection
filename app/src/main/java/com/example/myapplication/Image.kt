@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -9,12 +10,8 @@ import java.io.File
 
 class Image : AppCompatActivity() {
 
-    private val uri by lazy {
-        intent?.extras?.get("uri") as Uri
-    }
-
-    private val file by lazy {
-        intent?.extras?.get("file") as File
+    private val bitmap by lazy {
+        intent?.extras?.get("bitmap") as Bitmap
     }
 
 
@@ -22,20 +19,7 @@ class Image : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_image)
 
+        cameraImage.setImageBitmap(bitmap)
 
-       show()
-
-        cameraImage.setImageURI(uri)
-        Log.d("test",uri.path)
-
-    }
-
-    override fun onResume() {
-        super.onResume()
-        textView.text = intent?.extras?.getString("str","何もないよ")
-    }
-
-    private fun show(){
-        textView.text = intent?.extras?.getString("str","何もないよ")
     }
 }

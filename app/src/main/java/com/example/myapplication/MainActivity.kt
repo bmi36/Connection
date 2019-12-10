@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -109,18 +108,12 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == CAMERA_REQUEST_CODE) {
 
             registerDatabase(file)
-            val bitmap = BitmapFactory.decodeFile(file.absolutePath)
 
-
-
-        }
-    }
-
-    private val intent = {
-        startActivity(
-            Intent(this, Image::class.java)
+            val intent = Intent(this, Image::class.java)
                 .putExtra("file", file)
                 .putExtra("uri", uri)
-        )
+
+            startActivity(uploadToServer(file,intent))
+        }
     }
 }

@@ -1,10 +1,10 @@
 package com.example.myapplication
 
-import android.app.ProgressDialog
+import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Base64
 import android.util.Log
-import android.widget.ProgressBar
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -14,6 +14,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.POST
 import java.io.ByteArrayOutputStream
+import java.io.File
 
 interface RetrofitInterface {
     @POST("/post")
@@ -36,15 +37,16 @@ fun retrofitBuild(): RetrofitInterface {
         .build().create(RetrofitInterface::class.java)
 }
 
-fun uploadToServer(bitmap: Bitmap){
+fun uploadToServer(file: File, intent: Intent): Intent {
+    val bitmap = BitmapFactory.decodeFile(file.absolutePath)
     val retrofit = retrofitBuild()
     val image = toBase(bitmap)
-
+    var str = ""
     retrofit.sendImage(image).enqueue(object : Callback<TestCallback> {
 
         override fun onFailure(call: Call<TestCallback>, t: Throwable) {
-            "失敗した\n${t.message}"
 
+            str = "失敗した\n${t.message}"
 
         }
 
@@ -52,9 +54,12 @@ fun uploadToServer(bitmap: Bitmap){
             Log.d("result", "成功した")
             Log.d("result", response.message())
 
-            "成功した\n${response.message()}"
-        }
+            str = "成功した\n${response.message()}"
 
+
+        }
     })
+    intent.putExtra("request", str)
+    return intent
 }
 

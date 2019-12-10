@@ -16,6 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".loadFragment"></activity>
         <activity android:name=".Image" />
         <activity android:name=".MainActivity">
             <intent-filter>
