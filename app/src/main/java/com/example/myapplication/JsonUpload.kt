@@ -53,7 +53,7 @@ fun uploadToServer(file: File, intent: Intent): Intent {
             Log.d("result", "成功した")
             Log.d("result", response.message())
 
-            str = "成功した\n${response.message()}"
+            str = "成功した\n${response.body()?.foodname}\n${response.body()?.foodname}"
         }
     })
     intent.putExtra("request", str)
