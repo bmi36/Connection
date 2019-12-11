@@ -13,20 +13,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.coroutines.CoroutineContext
 
 const val CAMERA_REQUEST_CODE = 1
 const val CAMERA_PERMISSION_REQUEST_CODE = 2
 const val URL = "http://192.168.3.7:8080"
 const val PROBASE = "/json/server_android/result_return.json"
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), CoroutineScope {
 
     private lateinit var file: File
     private lateinit var uri: Uri
@@ -112,19 +110,19 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == CAMERA_REQUEST_CODE) {
 
             registerDatabase(file)
-            val intent = Intent(this,Image::class.java)
-            intent.putExtra("uri",uri)
-
-            response(intent)
+            startActivity(
+                Intent(this, Image::class.java)
+                    .putExtra("uri", uri)
+                    .putExtra("res", getResponse(file).toString())
+            )
 
         }
     }
 
-    private fun response(intent: Intent)= GlobalScope.launch(Dispatchers.Main){
-        withContext(Dispatchers.Default) { uploadToServer(file) }.let {
-            intent.putExtra("res", it.toString())
-            startActivity(intent)
-        }
-    }
+    override val coroutineContext: CoroutineContext
+        get() = Job()
 
+    private fun getResponse(file: File): TestCallback? = runBlocking(Dispatchers.Main) {
+        return@runBlocking withContext(Dispatchers.Default) { JsonUpload().uploadToServer(file) }
+    }
 }
