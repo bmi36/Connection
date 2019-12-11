@@ -15,8 +15,8 @@ class Image : AppCompatActivity() {
     }
 
 
-    private val result by lazy {
-        intent?.extras?.getString("rest", "💩")
+    private val result: String by lazy {
+        intent?.extras?.getString("res", "unko") as String
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

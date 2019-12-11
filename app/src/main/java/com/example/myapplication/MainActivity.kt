@@ -109,20 +109,22 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == CAMERA_REQUEST_CODE) {
 
-            registerDatabase(file)
-            startActivity(
-                Intent(this, Image::class.java)
-                    .putExtra("uri", uri)
-                    .putExtra("res", getResponse(file).toString())
-            )
 
+            registerDatabase(file)
+            launch {
+                startActivity(
+                    Intent(this@MainActivity, Image::class.java)
+                        .putExtra("uri", uri)
+                        .putExtra(
+                            "res",
+                            withContext(Dispatchers.Default) { JsonUpload().uploadToServer(file) })
+                )
+            }
         }
+
     }
 
     override val coroutineContext: CoroutineContext
         get() = Job()
 
-    private fun getResponse(file: File): TestCallback? = runBlocking(Dispatchers.Main) {
-        return@runBlocking withContext(Dispatchers.Default) { JsonUpload().uploadToServer(file) }
-    }
 }

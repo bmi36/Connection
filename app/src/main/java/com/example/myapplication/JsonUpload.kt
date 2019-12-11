@@ -4,8 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
 import android.util.Log
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -16,7 +14,6 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 import java.io.ByteArrayOutputStream
 import java.io.File
-import kotlin.coroutines.CoroutineContext
 
 interface RetrofitInterface {
     @POST("/post")
@@ -24,7 +21,7 @@ interface RetrofitInterface {
 }
 
 
-class JsonUpload: CoroutineScope {
+class JsonUpload{
 
     //写真をBASE64にエンコードするやつ
     private fun toBase(bitmap: Bitmap): String? {
@@ -41,26 +38,26 @@ class JsonUpload: CoroutineScope {
             .build().create(RetrofitInterface::class.java)
     }
 
-    fun uploadToServer(file: File): TestCallback?{
+    fun uploadToServer(file: File): String {
         val bitmap = BitmapFactory.decodeFile(file.absolutePath)
         val retrofit = retrofitBuild()
         val image = toBase(bitmap)
-        var str: TestCallback? = null
+        var str = ""
         retrofit.sendImage(image).enqueue(object : Callback<TestCallback> {
 
             override fun onFailure(call: Call<TestCallback>, t: Throwable) {
+                str = "Nothing"
+                Log.d("test",str)
             }
 
             override fun onResponse(call: Call<TestCallback>, response: Response<TestCallback>) {
                 Log.d("result", "成功した")
                 Log.d("result", response.message())
 
-                str = response.body()
+                val res = response.body()
+                str = "${res?.foodname}\n${res?.calorie}"
             }
         })
         return str
     }
-
-    override val coroutineContext: CoroutineContext
-        get() = Job()
 }
