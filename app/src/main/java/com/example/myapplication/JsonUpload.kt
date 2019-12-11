@@ -21,7 +21,10 @@ interface RetrofitInterface {
 }
 
 
-class JsonUpload{
+class JsonUpload {
+    companion object {
+        const val URL = "http://192.168.3.7:8080"
+    }
 
     //写真をBASE64にエンコードするやつ
     private fun toBase(bitmap: Bitmap): String? {
@@ -47,7 +50,7 @@ class JsonUpload{
 
             override fun onFailure(call: Call<TestCallback>, t: Throwable) {
                 str = "Nothing"
-                Log.d("test",str)
+                Log.d("test", str)
             }
 
             override fun onResponse(call: Call<TestCallback>, response: Response<TestCallback>) {

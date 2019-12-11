@@ -19,12 +19,13 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 
-const val CAMERA_REQUEST_CODE = 1
-const val CAMERA_PERMISSION_REQUEST_CODE = 2
-const val URL = "http://192.168.3.7:8080"
-const val PROBASE = "/json/server_android/result_return.json"
+
 
 class MainActivity : AppCompatActivity(), CoroutineScope {
+        companion object{
+            const val CAMERA_REQUEST_CODE = 1
+            const val CAMERA_PERMISSION_REQUEST_CODE = 2
+        }
 
     private lateinit var file: File
     private lateinit var uri: Uri
