@@ -20,12 +20,11 @@ import java.util.*
 import kotlin.coroutines.CoroutineContext
 
 
-
 class MainActivity : AppCompatActivity(), CoroutineScope {
-        companion object{
-            const val CAMERA_REQUEST_CODE = 1
-            const val CAMERA_PERMISSION_REQUEST_CODE = 2
-        }
+    companion object {
+        const val CAMERA_REQUEST_CODE = 1
+        const val CAMERA_PERMISSION_REQUEST_CODE = 2
+    }
 
     private lateinit var file: File
     private lateinit var uri: Uri
@@ -112,15 +111,11 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
 
             registerDatabase(file)
-            launch {
-                startActivity(
-                    Intent(this@MainActivity, Image::class.java)
-                        .putExtra("uri", uri)
-                        .putExtra(
-                            "res",
-                            withContext(Dispatchers.Default) { JsonUpload().uploadToServer(file) })
-                )
-            }
+            startActivity(
+                Intent(this, Image::class.java)
+                    .putExtra("uri", uri)
+                    .putExtra("file", file)
+            )
         }
 
     }
