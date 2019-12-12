@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import java.io.File
@@ -111,10 +112,11 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
 
             registerDatabase(file)
+            val res = Repository(file).uploadToServer()
             startActivity(
                 Intent(this, Image::class.java)
                     .putExtra("uri", uri)
-                    .putExtra("file", file)
+                    .putExtra("res",res?.toJson())
             )
         }
 

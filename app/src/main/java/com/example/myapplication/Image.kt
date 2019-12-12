@@ -14,21 +14,14 @@ class Image : AppCompatActivity() {
         intent?.extras?.get("uri") as Uri
     }
 
-    private val file: File by lazy {
-        intent?.extras?.get("file") as File
-    }
-
-    private val viewModel = ViewModelSample(file)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_image)
 
-        viewModel.data.observe(this, Observer {
-            Toast.makeText(this,"${it.foodname}\n${it.calorie}",Toast.LENGTH_LONG).show()
-        })
-
+        Toast.makeText(this,"${data.foodname}\n${data.calorie}",Toast.LENGTH_LONG).show()
         cameraImage.setImageURI(uri)
     }
+
+    private val  data = intent.getStringExtra("json").toDataClass()
 
 }
