@@ -8,12 +8,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.widget.ProgressBar
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
-import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import java.io.File
@@ -34,8 +33,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         Camerabutton.setOnClickListener { checkPermission() }
-        progressBar.visibility = ProgressBar.INVISIBLE
+        fragment
     }
 
     //ぱーにっしょんをリクエストするやつ
@@ -112,6 +112,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == CAMERA_REQUEST_CODE) {
 
+            frame_layout.visibility = FrameLayout.VISIBLE
 
             registerDatabase(file)
 
@@ -119,11 +120,23 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                 Repository(this@MainActivity, uri, file).uploadToServer()
             }
 
-            progressBar.visibility= ProgressBar.VISIBLE
         }
 
     }
 
+
+    private val fragment = {
+
+        val fragment = BlankFragment().also {
+            it.arguments = intent.extras
+        }
+
+        frame_layout.visibility = FrameLayout.VISIBLE
+        supportFragmentManager.beginTransaction().add(R.id.frame_layout, fragment).also {
+            it.commit()
+        }
+
+    }
     override val coroutineContext: CoroutineContext
         get() = Job()
 

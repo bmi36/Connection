@@ -1,18 +1,14 @@
 package com.example.myapplication
 
-import android.app.Activity
-import android.app.Application
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
 import android.util.Log
-import android.widget.Toast
-import com.google.gson.Gson
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
+import android.widget.FrameLayout
+import androidx.core.view.get
+import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -69,11 +65,17 @@ class Repository(
         val intent = Intent(activity,Image::class.java)
             .putExtra("uri",uri)
 
+        activity.supportFragmentManager.beginTransaction()
+            .remove(SampleFragment())
+
         retrofit.sendImage(baseImage).enqueue(object : Callback<TestCallback> {
             override fun onFailure(call: Call<TestCallback>, t: Throwable) {
                 Log.d("test", t.message)
 
-                activity.startActivity(intent)
+                activity.startActivity(intent).run {
+                    activity.frame_layout.visibility = FrameLayout.INVISIBLE
+                }
+
 
             }
 
@@ -86,7 +88,9 @@ class Repository(
                 Log.d("result", response.body()?.calorie.toString())
 
                    intent.putExtra("json",res?.toJson())
-                activity.startActivity(intent)
+                activity.startActivity(intent).let {
+                    activity.frame_layout.visibility = FrameLayout.INVISIBLE
+                }
             }
         })
     }
