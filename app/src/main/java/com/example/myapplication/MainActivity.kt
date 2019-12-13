@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -34,6 +35,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Camerabutton.setOnClickListener { checkPermission() }
+        progressBar.visibility = ProgressBar.INVISIBLE
     }
 
     //ぱーにっしょんをリクエストするやつ
@@ -112,12 +114,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
 
             registerDatabase(file)
-            val res = Repository(file).uploadToServer()
-            startActivity(
-                Intent(this, Image::class.java)
-                    .putExtra("uri", uri)
-                    .putExtra("res",res?.toJson())
-            )
+
+            launch {
+                Repository(this@MainActivity, uri, file).uploadToServer()
+            }
+
+            progressBar.visibility= ProgressBar.VISIBLE
         }
 
     }

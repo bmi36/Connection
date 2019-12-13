@@ -1,9 +1,15 @@
 package com.example.myapplication
 
+import android.app.Activity
+import android.app.Application
+import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Base64
 import android.util.Log
+import android.widget.Toast
 import com.google.gson.Gson
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
@@ -17,61 +23,71 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 interface RetrofitInterface {
     @POST("/post")
     fun sendImage(@Body image: String?): Call<TestCallback>
 }
 
+const val URL = "http://192.168.3.7:8080"
 
-class Repository(val file: File) {
+//写真をBASE64にエンコードするやつ
+fun toBase(bitmap: Bitmap): String {
+    val bao = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bao)
+    val ba = bao.toByteArray()
+    return Base64.encodeToString(ba, Base64.DEFAULT)
+}
 
-    companion object {
-        const val URL = "http://192.168.3.7:8080"
-    }
+fun retrofitBuild(): RetrofitInterface {
+    return Retrofit.Builder()
+        .baseUrl(URL).client(OkHttpClient().newBuilder()
+            .connectTimeout(30,TimeUnit.SECONDS)
+            .writeTimeout(30,TimeUnit.SECONDS)
+            .readTimeout(30,TimeUnit.SECONDS)
+            .build())
+        .addConverterFactory(GsonConverterFactory.create())
+        .build().create(RetrofitInterface::class.java)
+}
 
-    //写真をBASE64にエンコードするやつ
-    private fun toBase(bitmap: Bitmap): String? {
-        val bao = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bao)
-        val ba = bao.toByteArray()
-        return Base64.encodeToString(ba, Base64.DEFAULT)
-    }
+class Repository(
+    private val activity: MainActivity,
+    private val uri: Uri,
+    file: File
 
-    private fun retrofitBuild(): RetrofitInterface {
-        return Retrofit.Builder()
-            .baseUrl(URL).client(OkHttpClient().newBuilder().build())
-            .addConverterFactory(GsonConverterFactory.create())
-            .build().create(RetrofitInterface::class.java)
-    }
+) {
 
+    private val retrofit = retrofitBuild()
 
-    fun uploadToServer() = runBlocking {
-        val retrofit = retrofitBuild()
+    private val baseImage: String = toBase(BitmapFactory.decodeFile(file.absolutePath))
 
-        val baseImage = toBase(BitmapFactory.decodeFile(file.absolutePath))
+    private var res: TestCallback? = null
 
-        var res: TestCallback? = null
-        async {
-            retrofit.sendImage(baseImage).enqueue(object : Callback<TestCallback> {
-                override fun onFailure(call: Call<TestCallback>, t: Throwable) {
-                    Log.d("test", t.message)
+    fun uploadToServer() {
 
-                }
+        val intent = Intent(activity,Image::class.java)
+            .putExtra("uri",uri)
 
-                override fun onResponse(
-                    call: Call<TestCallback>,
-                    response: Response<TestCallback>
-                ) {
-                    Log.d("result", "成功した")
-                    Log.d("result", response.body()?.foodname)
-                    Log.d("result", response.body()?.calorie.toString())
+        retrofit.sendImage(baseImage).enqueue(object : Callback<TestCallback> {
+            override fun onFailure(call: Call<TestCallback>, t: Throwable) {
+                Log.d("test", t.message)
 
-                    res = response.body()
+                activity.startActivity(intent)
 
-                }
-            })
-            return@async res
-        }.await()
+            }
+
+            override fun onResponse(
+                call: Call<TestCallback>,
+                response: Response<TestCallback>
+            ) {
+                Log.d("result", "成功した")
+                Log.d("result", response.body()?.foodname)
+                Log.d("result", response.body()?.calorie.toString())
+
+                   intent.putExtra("json",res?.toJson())
+                activity.startActivity(intent)
+            }
+        })
     }
 }

@@ -18,10 +18,7 @@ class Image : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_image)
 
-        Toast.makeText(this,"${data.foodname}\n${data.calorie}",Toast.LENGTH_LONG).show()
         cameraImage.setImageURI(uri)
     }
-
-    private val  data = intent.getStringExtra("json").toDataClass()
 
 }
