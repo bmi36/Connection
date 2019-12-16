@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import android.Manifest
+import android.app.Activity
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -13,6 +14,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
+import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import java.io.File
@@ -27,6 +29,11 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         const val CAMERA_PERMISSION_REQUEST_CODE = 2
     }
 
+
+    private val fragment by lazy {
+        supportFragmentManager.beginTransaction()
+    }
+
     private lateinit var file: File
     private lateinit var uri: Uri
 
@@ -35,7 +42,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         setContentView(R.layout.activity_main)
 
         Camerabutton.setOnClickListener { checkPermission() }
-        fragment
     }
 
     //ぱーにっしょんをリクエストするやつ
@@ -67,7 +73,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         val name = SimpleDateFormat("ddHHmmss", Locale.US).format(Date()).let {
             String.format("CameraIntent_%s.jpg", it)
         }
-
         file = File(folder, name)
         uri = FileProvider.getUriForFile(
             applicationContext, "$packageName.fileprovider",
@@ -106,38 +111,23 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         }
     }
 
-
     //写真撮った後のやつ
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CAMERA_REQUEST_CODE) {
+        if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
 
-            frame_layout.visibility = FrameLayout.VISIBLE
-
-            registerDatabase(file)
+            fragment.replace(frame.id, BlankFragment()).commit()
 
             launch {
+                registerDatabase(file)
                 Repository(this@MainActivity, uri, file).uploadToServer()
             }
 
         }
-
     }
 
-
-    private val fragment = {
-
-        val fragment = BlankFragment().also {
-            it.arguments = intent.extras
-        }
-
-        frame_layout.visibility = FrameLayout.VISIBLE
-        supportFragmentManager.beginTransaction().add(R.id.frame_layout, fragment).also {
-            it.commit()
-        }
-
-    }
     override val coroutineContext: CoroutineContext
         get() = Job()
+
 
 }

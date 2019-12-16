@@ -38,11 +38,13 @@ fun toBase(bitmap: Bitmap): String {
 
 fun retrofitBuild(): RetrofitInterface {
     return Retrofit.Builder()
-        .baseUrl(URL).client(OkHttpClient().newBuilder()
-            .connectTimeout(30,TimeUnit.SECONDS)
-            .writeTimeout(30,TimeUnit.SECONDS)
-            .readTimeout(30,TimeUnit.SECONDS)
-            .build())
+        .baseUrl(URL).client(
+            OkHttpClient().newBuilder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .build()
+        )
         .addConverterFactory(GsonConverterFactory.create())
         .build().create(RetrofitInterface::class.java)
 }
@@ -62,19 +64,15 @@ class Repository(
 
     fun uploadToServer() {
 
-        val intent = Intent(activity,Image::class.java)
-            .putExtra("uri",uri)
+        val intent = Intent(activity, Image::class.java)
+            .putExtra("uri", uri)
 
-        activity.supportFragmentManager.beginTransaction()
-            .remove(SampleFragment())
 
         retrofit.sendImage(baseImage).enqueue(object : Callback<TestCallback> {
             override fun onFailure(call: Call<TestCallback>, t: Throwable) {
                 Log.d("test", t.message)
 
-                activity.startActivity(intent).run {
-                    activity.frame_layout.visibility = FrameLayout.INVISIBLE
-                }
+                activity.startActivity(intent)
 
 
             }
@@ -87,10 +85,8 @@ class Repository(
                 Log.d("result", response.body()?.foodname)
                 Log.d("result", response.body()?.calorie.toString())
 
-                   intent.putExtra("json",res?.toJson())
-                activity.startActivity(intent).let {
-                    activity.frame_layout.visibility = FrameLayout.INVISIBLE
-                }
+                intent.putExtra("json",res?.toJson())
+                activity.startActivity(intent)
             }
         })
     }

@@ -23,4 +23,8 @@ class BlankFragment : Fragment() {
 
         progressBar.visibility = ProgressBar.VISIBLE
     }
+
+    companion object{
+        fun newInstance() = BlankFragment()
+    }
 }
