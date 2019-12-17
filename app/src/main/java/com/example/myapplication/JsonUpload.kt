@@ -3,12 +3,8 @@ package com.example.myapplication
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.util.Base64
 import android.util.Log
-import android.widget.FrameLayout
-import androidx.core.view.get
-import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -40,9 +36,9 @@ fun retrofitBuild(): RetrofitInterface {
     return Retrofit.Builder()
         .baseUrl(URL).client(
             OkHttpClient().newBuilder()
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
+                .connectTimeout(3, TimeUnit.SECONDS)
+                .writeTimeout(3, TimeUnit.SECONDS)
+                .readTimeout(3, TimeUnit.SECONDS)
                 .build()
         )
         .addConverterFactory(GsonConverterFactory.create())
@@ -51,28 +47,22 @@ fun retrofitBuild(): RetrofitInterface {
 
 class Repository(
     private val activity: MainActivity,
-    private val uri: Uri,
-    file: File
-
+    file: File,
+    private val intent: Intent
 ) {
 
     private val retrofit = retrofitBuild()
 
     private val baseImage: String = toBase(BitmapFactory.decodeFile(file.absolutePath))
 
-    private var res: TestCallback? = null
-
     fun uploadToServer() {
-
-        val intent = Intent(activity, Image::class.java)
-            .putExtra("uri", uri)
-
 
         retrofit.sendImage(baseImage).enqueue(object : Callback<TestCallback> {
             override fun onFailure(call: Call<TestCallback>, t: Throwable) {
                 Log.d("test", t.message)
+                intent.removeExtra("json")
+                activity.startActivityForResult(intent, IMAGE_REQUEST_CODE)
 
-                activity.startActivity(intent)
 
 
             }
@@ -85,8 +75,8 @@ class Repository(
                 Log.d("result", response.body()?.foodname)
                 Log.d("result", response.body()?.calorie.toString())
 
-                intent.putExtra("json",res?.toJson())
-                activity.startActivity(intent)
+                intent.putExtra("json",response.body()?.toJson())
+                activity.startActivityForResult(intent, IMAGE_REQUEST_CODE)
             }
         })
     }

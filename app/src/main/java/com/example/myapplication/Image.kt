@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
@@ -20,12 +21,12 @@ class Image : AppCompatActivity() {
 
         cameraImage.setImageURI(uri)
 
-        val str = if (json != null) {
-            json?.toDataClass().let {
-                "${it.foodname}\n${it.calorie}"
-            }
-        } else {"Nothing"}
+        val str = json?.toDataClass()?.let {
+            "${it.foodname}\n${it.calorie}"
+        } ?: "Nothing"
 
-        Toast.makeText(this, str, Toast.LENGTH_LONG).show()
-    }
+        setResult(RESULT_CANCELED, Intent().putExtra("flg",1))
+
+    Toast.makeText(this, str, Toast.LENGTH_LONG).show()
+}
 }

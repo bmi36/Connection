@@ -14,7 +14,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
-import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import java.io.File
@@ -22,17 +21,11 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 
+const val CAMERA_REQUEST_CODE = 1
+const val CAMERA_PERMISSION_REQUEST_CODE = 2
+const val IMAGE_REQUEST_CODE = 3
 
 class MainActivity : AppCompatActivity(), CoroutineScope {
-    companion object {
-        const val CAMERA_REQUEST_CODE = 1
-        const val CAMERA_PERMISSION_REQUEST_CODE = 2
-    }
-
-
-    private val fragment by lazy {
-        supportFragmentManager.beginTransaction()
-    }
 
     private lateinit var file: File
     private lateinit var uri: Uri
@@ -114,20 +107,32 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
     //写真撮った後のやつ
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == CAMERA_REQUEST_CODE) {
 
-            fragment.replace(frame.id, BlankFragment()).commit()
+                frame.visibility = FrameLayout.VISIBLE
+                supportFragmentManager.beginTransaction().replace(frame.id, BlankFragment())
+                    .commit()
 
-            launch {
+
                 registerDatabase(file)
-                Repository(this@MainActivity, uri, file).uploadToServer()
-            }
 
+                launch {
+                    val intent = Intent(this@MainActivity,Image::class.java)
+                        .putExtra("uri",uri)
+                    withContext(Dispatchers.Default) {
+                        Repository(this@MainActivity, file,intent).uploadToServer()
+                    }
+                }
+                Toast.makeText(this, "aaaa", Toast.LENGTH_SHORT).show()
+            }
+        } else if (requestCode == IMAGE_REQUEST_CODE) {
+            frame.visibility = FrameLayout.INVISIBLE
+            supportFragmentManager.beginTransaction().remove(BlankFragment()).commit()
+            Toast.makeText(this, "uu", Toast.LENGTH_SHORT).show()
         }
     }
 
     override val coroutineContext: CoroutineContext
         get() = Job()
-
-
 }
