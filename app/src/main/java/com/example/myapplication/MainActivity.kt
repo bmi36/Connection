@@ -155,14 +155,20 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                     Log.d("result", response.body()?.foodname)
                     Log.d("result", response.body()?.calorie.toString())
 
-                    startActivityForResult(
+                    if (response.body() != null) {
+                        val task = response.body() as TestCallback
+                        startActivityForResult(
 
-                        Intent(this@MainActivity, Image::class.java).apply {
-                            this.putExtra("uri", uri)
-                            this.putExtra("json", response.body()?.toJson())
-                        }, IMAGE_REQUEST_CODE
-                    )
+                            Intent(this@MainActivity, Image::class.java).apply {
+                                this.putExtra("uri", uri)
+                                this.putExtra("json",task.toJson())
+                            }, IMAGE_REQUEST_CODE
+                        )
+                    }else{
+                        startActivity(Intent(this@MainActivity,ImageFalse::class.java))
+                    }
                     frame.visibility = FrameLayout.INVISIBLE
+
                 }
             })
         }
