@@ -155,13 +155,15 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                     Log.d("result", response.body()?.foodname)
                     Log.d("result", response.body()?.calorie.toString())
 
-                    if (response.body() != null) {
+                    if (response.isSuccessful) {
                         val task = response.body() as TestCallback
                         startActivityForResult(
 
                             Intent(this@MainActivity, Image::class.java).apply {
                                 this.putExtra("uri", uri)
-                                this.putExtra("json",task.toJson())
+                                this.putExtra("json",task.toJson()).also {
+                                    Log.d("test",task.toJson())
+                                }
                             }, IMAGE_REQUEST_CODE
                         )
                     }else{
