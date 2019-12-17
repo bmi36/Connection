@@ -1,20 +1,14 @@
 package com.example.myapplication
 
-import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.util.Base64
-import android.util.Log
 import okhttp3.OkHttpClient
 import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.POST
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.util.concurrent.TimeUnit
 
 interface RetrofitInterface {
@@ -45,39 +39,3 @@ fun retrofitBuild(): RetrofitInterface {
         .build().create(RetrofitInterface::class.java)
 }
 
-class Repository(
-    private val activity: MainActivity,
-    file: File,
-    private val intent: Intent
-) {
-
-    private val retrofit = retrofitBuild()
-
-    private val baseImage: String = toBase(BitmapFactory.decodeFile(file.absolutePath))
-
-    fun uploadToServer() {
-
-        retrofit.sendImage(baseImage).enqueue(object : Callback<TestCallback> {
-            override fun onFailure(call: Call<TestCallback>, t: Throwable) {
-                Log.d("test", t.message)
-                intent.removeExtra("json")
-                activity.startActivityForResult(intent, IMAGE_REQUEST_CODE)
-
-
-
-            }
-
-            override fun onResponse(
-                call: Call<TestCallback>,
-                response: Response<TestCallback>
-            ) {
-                Log.d("result", "成功した")
-                Log.d("result", response.body()?.foodname)
-                Log.d("result", response.body()?.calorie.toString())
-
-                intent.putExtra("json",response.body()?.toJson())
-                activity.startActivityForResult(intent, IMAGE_REQUEST_CODE)
-            }
-        })
-    }
-}

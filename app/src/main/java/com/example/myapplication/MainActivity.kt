@@ -5,10 +5,12 @@ import android.app.Activity
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +18,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -114,22 +119,52 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                 supportFragmentManager.beginTransaction().replace(frame.id, BlankFragment())
                     .commit()
 
-
                 registerDatabase(file)
 
-                launch {
-                    val intent = Intent(this@MainActivity,Image::class.java)
-                        .putExtra("uri",uri)
-                    withContext(Dispatchers.Default) {
-                        Repository(this@MainActivity, file,intent).uploadToServer()
-                    }
-                }
-                Toast.makeText(this, "aaaa", Toast.LENGTH_SHORT).show()
+                //retrofit使うやつ
+                sendJob(file).start()
+
             }
-        } else if (requestCode == IMAGE_REQUEST_CODE) {
-            frame.visibility = FrameLayout.INVISIBLE
+            Toast.makeText(this, "aaaa", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun sendJob(file: File) = launch(Dispatchers.Main) {
+        val retrofit = retrofitBuild()
+        val baseImage: String = toBase(BitmapFactory.decodeFile(file.absolutePath))
+
+        withContext(Dispatchers.Default) {
+
             supportFragmentManager.beginTransaction().remove(BlankFragment()).commit()
-            Toast.makeText(this, "uu", Toast.LENGTH_SHORT).show()
+
+            retrofit.sendImage(baseImage).enqueue(object : Callback<TestCallback> {
+                override fun onFailure(call: Call<TestCallback>, t: Throwable) {
+                    frame.visibility = FrameLayout.INVISIBLE
+                    startActivityForResult(
+                        Intent(this@MainActivity, ImageFalse::class.java).apply {
+                            this.removeExtra("json")
+                        }, IMAGE_REQUEST_CODE
+                    )
+                }
+
+                override fun onResponse(
+                    call: Call<TestCallback>,
+                    response: Response<TestCallback>
+                ) {
+                    Log.d("result", "成功した")
+                    Log.d("result", response.body()?.foodname)
+                    Log.d("result", response.body()?.calorie.toString())
+
+                    startActivityForResult(
+
+                        Intent(this@MainActivity, Image::class.java).apply {
+                            this.putExtra("uri", uri)
+                            this.putExtra("json", response.body()?.toJson())
+                        }, IMAGE_REQUEST_CODE
+                    )
+                    frame.visibility = FrameLayout.INVISIBLE
+                }
+            })
         }
     }
 
